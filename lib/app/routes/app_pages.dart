@@ -9,6 +9,7 @@ abstract class AppRoutes {
   static const root = '/';
   static const matchDetail = '/match';
   static const privacy = '/privacy';
+  static const matchIdParam = 'matchId';
 }
 
 class AppPages {
@@ -18,13 +19,13 @@ class AppPages {
       name: AppRoutes.matchDetail,
       page: () => const MatchDetailPage(),
       binding: BindingsBuilder(() {
-        final matchId = Get.parameters['matchId'];
+        final matchId = Get.parameters[AppRoutes.matchIdParam];
         if (matchId == null || matchId.isEmpty) {
           return;
         }
 
-        Get.put(
-          MatchDetailController.create(matchId),
+        Get.lazyPut<MatchDetailController>(
+          () => MatchDetailController.create(matchId),
           tag: matchId,
         );
       }),

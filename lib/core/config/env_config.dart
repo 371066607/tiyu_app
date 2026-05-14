@@ -51,4 +51,6 @@ class EnvConfig {
   final String apiBaseUrl;
   final String wsBaseUrl;
   final Map<String, bool> featureFlags;
+
+  bool get useMockData => flavor == AppFlavor.mock;
 }

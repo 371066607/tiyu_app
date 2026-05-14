@@ -1,7 +1,11 @@
+import 'dart:core' hide Match;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../app/routes/app_pages.dart';
 import '../../core/widgets/async_state_view.dart';
+import '../../domain/models/match.dart';
 import '../home/widgets/match_card.dart';
 import 'favorites_controller.dart';
 
@@ -14,7 +18,7 @@ class FavoritesPage extends GetView<FavoritesController> {
       appBar: AppBar(title: const Text('关注')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: AsyncStateView<List<dynamic>>(
+        child: AsyncStateView<List<Match>>(
           controller: controller,
           onRetry: controller.loadFavorites,
           emptyTitle: '还没有关注比赛',
@@ -30,10 +34,15 @@ class FavoritesPage extends GetView<FavoritesController> {
                   final match = matches[index];
                   return MatchCard(
                     match: match,
-                    isFavorite: true,
-                    onTap: () {}, // TODO: Navigate to match detail
-                    onFavoriteTap: () => controller.toggleFavorite(match),
-                  );
+                  isFavorite: true,
+                  onTap: () => Get.toNamed(
+                    AppRoutes.matchDetail,
+                    parameters: {
+                      AppRoutes.matchIdParam: match.id,
+                    },
+                  ),
+                  onFavoriteTap: () => controller.toggleFavorite(match.id),
+                );
                 },
               ),
             );

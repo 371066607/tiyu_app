@@ -1,27 +1,64 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import '../lib/data/repositories/sports_repository_impl.dart';
-import '../lib/data/api/api_client.dart';
-import '../lib/domain/models/match.dart';
 
-class MockApiClient extends Mock implements ApiClient {}
+import 'package:tiyu_app/data/repositories/mock_sports_repository.dart';
+import 'package:tiyu_app/domain/models/match.dart';
+import 'package:tiyu_app/domain/models/standing_row.dart';
+import 'package:tiyu_app/domain/models/sport_type.dart';
 
 void main() {
-  late SportsRepositoryImpl repo;
-  late MockApiClient client;
+  late MockSportsRepository repository;
 
   setUp(() {
-    client = MockApiClient();
-    repo = SportsRepositoryImpl(apiClient: client);
+    repository = MockSportsRepository();
   });
 
-  test('getAllFixtures returns list of matches', () async {
-    when(client.get('/matches')).thenAnswer((_) async => [
-      {'id': '1', 'homeTeam': 'A', 'awayTeam': 'B', 'kickoffAt': DateTime.now().toIso8601String(), 'status': 'scheduled'}
-    ]);
+  group('MockSportsRepository', () {
+    test('getAllFixtures returns list of matches', () async {
+      final matches = await repository.getAllFixtures();
+      expect(matches, isA<List<Match>>());
+      expect(matches.length, greaterThan(0));
+    });
 
-    final matches = await repo.getAllFixtures();
-    expect(matches, isA<List<Match>>());
-    expect(matches.length, 1);
+    test('getFixtures returns filtered results by date', () async {
+      final today = DateTime.now();
+      final matches = await repository.getFixtures(
+        date: today,
+        sportType: SportType.football,
+      );
+      expect(matches, isA<List<Match>>());
+    });
+
+    test('getFixtures returns empty for non-football sports', () async {
+      final today = DateTime.now();
+      final matches = await repository.getFixtures(
+        date: today,
+        sportType: SportType.basketball,
+      );
+      expect(matches, isEmpty);
+    });
+
+    test('getMatchDetail returns detail for valid match', () async {
+      final detail = await repository.getMatchDetail('match_001');
+      expect(detail.match.id, 'match_001');
+      expect(detail.events, isNotEmpty);
+      expect(detail.headline, isNotEmpty);
+    });
+
+    test('getMatchDetail throws for invalid match', () async {
+      expect(
+        () => repository.getMatchDetail('invalid_id'),
+        throwsException,
+      );
+    });
+
+    test('getStandings returns list of standings', () async {
+      final standings = await repository.getStandings(
+        leagueId: 'pl',
+        season: 2024,
+      );
+      expect(standings, isA<List<StandingRow>>());
+      expect(standings.length, greaterThan(0));
+      expect(standings[0].rank, 1);
+    });
   });
 }

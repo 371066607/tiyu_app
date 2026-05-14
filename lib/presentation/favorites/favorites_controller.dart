@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 
 import '../../domain/models/match.dart';
 import '../../domain/repositories/favorites_repository.dart';
+import '../../domain/repositories/settings_repository.dart';
 import '../../domain/repositories/sports_repository.dart';
+import '../../domain/services/notification_service.dart';
 
 class FavoritesController extends GetxController with StateMixin<List<Match>> {
   FavoritesController({
@@ -13,6 +15,16 @@ class FavoritesController extends GetxController with StateMixin<List<Match>> {
   final FavoritesRepository favoritesRepository;
   final SportsRepository sportsRepository;
   final favoriteIds = <String>{}.obs;
+
+  late final NotificationService _notificationService;
+  late final SettingsRepository _settingsRepository;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _notificationService = Get.find<NotificationService>();
+    _settingsRepository = Get.find<SettingsRepository>();
+  }
 
   Future<void> loadFavorites() async {
     change(null, status: RxStatus.loading());
@@ -48,5 +60,16 @@ class FavoritesController extends GetxController with StateMixin<List<Match>> {
 
     await favoritesRepository.saveFavoriteMatchIds(favoriteIds.toSet());
     await loadFavorites();
+  }
+
+  Future<void> testNotification(Match match) async {
+    final settings = await _settingsRepository.loadSettings();
+    if (!settings.allowNotifications) return;
+
+    await _notificationService.showKickoffNotification(
+      matchId: match.id,
+      homeTeam: match.homeTeam.name,
+      awayTeam: match.awayTeam.name,
+    );
   }
 }

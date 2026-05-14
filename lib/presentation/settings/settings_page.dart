@@ -29,17 +29,17 @@ class SettingsPage extends GetView<SettingsController> {
                         children: [
                           _ThemeChip(
                             label: '跟随系统',
-                            selected: settings.themeMode.value == ThemeMode.system,
+                            selected: settings.value.themeMode == ThemeMode.system,
                             onTap: () => controller.updateThemeMode(ThemeMode.system),
                           ),
                           _ThemeChip(
                             label: '浅色',
-                            selected: settings.themeMode.value == ThemeMode.light,
+                            selected: settings.value.themeMode == ThemeMode.light,
                             onTap: () => controller.updateThemeMode(ThemeMode.light),
                           ),
                           _ThemeChip(
                             label: '深色',
-                            selected: settings.themeMode.value == ThemeMode.dark,
+                            selected: settings.value.themeMode == ThemeMode.dark,
                             onTap: () => controller.updateThemeMode(ThemeMode.dark),
                           ),
                         ],
@@ -53,28 +53,28 @@ class SettingsPage extends GetView<SettingsController> {
                 child: Column(
                   children: [
                     SwitchListTile(
-                      value: settings.allowNotifications.value,
+                      value: settings.value.allowNotifications,
                       onChanged: controller.toggleNotifications,
                       title: const Text('开启通知提醒'),
                       subtitle: const Text('为关注比赛提供开赛、进球、红牌提醒'),
                     ),
                     SwitchListTile(
-                      value: settings.goalNotifications.value,
-                      onChanged: settings.allowNotifications.value
+                      value: settings.value.goalNotifications,
+                      onChanged: settings.value.allowNotifications
                           ? controller.toggleGoalNotifications
                           : null,
                       title: const Text('进球提醒'),
                     ),
                     SwitchListTile(
-                      value: settings.redCardNotifications.value,
-                      onChanged: settings.allowNotifications.value
+                      value: settings.value.redCardNotifications,
+                      onChanged: settings.value.allowNotifications
                           ? controller.toggleRedCardNotifications
                           : null,
                       title: const Text('红牌提醒'),
                     ),
                     SwitchListTile(
-                      value: settings.kickoffNotifications.value,
-                      onChanged: settings.allowNotifications.value
+                      value: settings.value.kickoffNotifications,
+                      onChanged: settings.value.allowNotifications
                           ? controller.toggleKickoffNotifications
                           : null,
                       title: const Text('开赛提醒'),
@@ -92,6 +92,13 @@ class SettingsPage extends GetView<SettingsController> {
                       subtitle: const Text('说明通知与本地偏好存储用途'),
                       trailing: const Icon(Icons.chevron_right_rounded),
                       onTap: controller.openPrivacyPage,
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.notifications_active_outlined),
+                      title: const Text('测试通知'),
+                      subtitle: const Text('发送一条本地测试通知'),
+                      onTap: () => controller.sendTestNotification(),
                     ),
                     const Divider(height: 1),
                     ListTile(

@@ -12,10 +12,10 @@ class RootPage extends GetView<RootController> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => Scaffold(
+    return GetBuilder<RootController>(
+      builder: (ctrl) => Scaffold(
         body: IndexedStack(
-          index: controller.currentIndex.value,
+          index: ctrl.currentIndex,
           children: const [
             HomePage(),
             StandingsPage(),
@@ -24,8 +24,8 @@ class RootPage extends GetView<RootController> {
           ],
         ),
         bottomNavigationBar: NavigationBar(
-          selectedIndex: controller.currentIndex.value,
-          onDestinationSelected: controller.changeTab,
+          selectedIndex: ctrl.currentIndex,
+          onDestinationSelected: ctrl.changeTab,
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),

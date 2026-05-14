@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
 
 class RootController extends GetxController {
-  final currentIndex = 0.obs;
+  int currentIndex = 0;
 
   void changeTab(int index) {
-    currentIndex.value = index;
+    currentIndex = index;
+    update();
   }
 }

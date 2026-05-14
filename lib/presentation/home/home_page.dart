@@ -1,9 +1,12 @@
+import 'dart:core' hide Match;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../app/routes/app_pages.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/async_state_view.dart';
+import '../../domain/models/match.dart';
 import '../favorites/favorites_controller.dart';
 import 'home_controller.dart';
 import 'widgets/date_selector.dart';
@@ -66,35 +69,39 @@ class HomePage extends GetView<HomeController> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: AsyncStateView<List<dynamic>>(
+                child: AsyncStateView<List<Match>>(
                   controller: controller,
                   onRetry: controller.loadFixtures,
                   emptyTitle: '这个分类还没有比赛',
                   emptyMessage: '当前只准备了足球 MVP 数据，其它项目已经预留扩展位。',
                   builder: (matches) {
                     return Obx(
-                      () => RefreshIndicator(
-                        onRefresh: controller.loadFixtures,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.only(bottom: 28),
-                          itemCount: matches.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 14),
-                          itemBuilder: (context, index) {
-                            final match = matches[index] as dynamic;
-                            return MatchCard(
-                              match: match,
-                              isFavorite:
-                                  favoritesController.favoriteIds.contains(match.id),
-                              onTap: () => Get.toNamed(
-                                AppRoutes.matchDetail,
-                                parameters: {'matchId': match.id},
-                              ),
-                              onFavoriteTap: () =>
-                                  favoritesController.toggleFavorite(match.id),
-                            );
-                          },
-                        ),
-                      ),
+                      () {
+                        final ids = favoritesController.favoriteIds.toSet();
+                        return RefreshIndicator(
+                          onRefresh: controller.loadFixtures,
+                          child: ListView.separated(
+                            padding: const EdgeInsets.only(bottom: 28),
+                            itemCount: matches.length,
+                            separatorBuilder: (_, _) => const SizedBox(height: 14),
+                            itemBuilder: (context, index) {
+                              final match = matches[index];
+                              return MatchCard(
+                                match: match,
+                                isFavorite: ids.contains(match.id),
+                                onTap: () => Get.toNamed(
+                                  AppRoutes.matchDetail,
+                                  parameters: {
+                                    AppRoutes.matchIdParam: match.id,
+                                  },
+                                ),
+                                onFavoriteTap: () =>
+                                    favoritesController.toggleFavorite(match.id),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     );
                   },
                 ),

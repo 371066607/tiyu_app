@@ -20,7 +20,7 @@ class AsyncStateView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return controller.obx(
-      builder,
+      (state) => state != null ? builder(state) : const SizedBox.shrink(),
       onLoading: const Center(child: CircularProgressIndicator()),
       onEmpty: _StateMessage(
         title: emptyTitle,
